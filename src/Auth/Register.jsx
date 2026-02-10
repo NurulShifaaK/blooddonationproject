@@ -1,78 +1,151 @@
-import React, { useState } from 'react'
-import bg from "../assets/registerbg.jpeg"
-import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
 
-const Signup = () => {
-   const navigate = useNavigate();
-  const[username,setusername]=useState("");
-    const[email,setemail]=useState("")
-    const[password,setpassword]=useState("")
-     const[errmsg,seterrmsg]=useState("")
-const registerUser=async()=>{
-  try{
-const res=await axios.post("http://localhost:8000/api/v1/register",{
- name:username,
- email:email,
- password:password,
-  })
-  if(res.data.success===true){
-    navigate("/login")  }
-  }catch(err){
-    seterrmsg("Registration failed")
-  }
- }
-    
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { User, Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import axios from "axios";
+import bg from "../assets/registerbg.jpeg"; // Your register background image
+
+const Register = () => {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errmsg, setErrmsg] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setErrmsg("");
+    setIsLoading(true);
+
+    try {
+      const res = await axios.post(
+        import.meta.env.VITE_REGISTER_API,
+        {
+          name: username,
+          email: email,
+          password: password,
+        }
+      );
+
+      if (res.data.success === true) {
+        navigate("/login");
+      }
+    } catch (err) {
+      console.error(err);
+      setErrmsg("Registration failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <>
-          
-    <div className='flex flex-col justify-center h-screen items-center gap-5'
-    style={{
-        backgroundImage: `url(${bg})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat"
-      }}
+    <div 
+      className="min-h-screen w-full flex items-center justify-center p-4 bg-cover bg-center"
+      style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${bg})` }}
+    >
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="w-full max-w-md bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl"
       >
-    <p className='font-semibold text-3xl'>
-        Craft your glow</p>
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Craft Your Glow</h1>
+          <p className="text-gray-600 italic">"Join our community and save lives"</p>
+        </div>
 
-    <div className='flex flex-col gap-5' >
-    <input 
-    value={username}
-    onChange={(e)=>setusername(e.target.value)}
-    className='border border-black/20 rounded-lg px-4 py-2 w-[300px] hover:shadow-lg outline-none bg-white'
-    placeholder='Name' />
-    <input
-    className='border border-black/20 outline-none bg-white rounded-lg px-4 py-2 w-[300px] hover:shadow-lg'
-    type="email"
-    value={email}
-    placeholder='Email'
-    onChange={(e)=>setemail(e.target.value)} />
+        {/* Form */}
+        <form onSubmit={handleRegister} className="space-y-5">
+          <AnimatePresence>
+            {errmsg && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm"
+              >
+                <AlertCircle size={18} />
+                {errmsg}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-    <input 
-    className='border border-black/20 rounded-lg px-4 py-2 outline-none bg-white w-[300px] hover:shadow-lg'
-    type="password"
-    value={password}
-    placeholder='Password'
-    onChange={(e)=>setpassword(e.target.value)} />
+          {/* Name Field */}
+          <div className="relative">
+            <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 outline-none rounded-xl focus:ring-2 focus:ring-black/5 focus:border-black transition-all"
+              type="text"
+              placeholder="Full Name"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
 
-    {errmsg && <p className='text-red-500 text-sm font-semibold'>{errmsg}</p>}
+          {/* Email Field */}
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 outline-none rounded-xl focus:ring-2 focus:ring-black/5 focus:border-black transition-all"
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-    <button 
-    onClick={registerUser}
-   className='bg-black text-white px-4 py-2 rounded-xl'
-    >Signup</button>
+          {/* Password Field */}
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 outline-none rounded-xl focus:ring-2 focus:ring-black/5 focus:border-black transition-all"
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
 
-     <p 
-     className='text-center text-black/60 font-semibold text-lg'>
-        Already member?<Link to={"/login"}><span className='font-bold hover:underline text-pink-900 hover:cursor-default'>
-            Login</span></Link></p>
-   </div>
-   </div>
-   </>
-  )
-}
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-black text-white py-3 rounded-xl font-bold shadow-lg hover:bg-gray-800 transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+          >
+            {isLoading ? (
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              <>
+                Signup
+                <ArrowRight size={18} />
+              </>
+            )}
+          </button>
+        </form>
 
-export default Signup
+        {/* Footer */}
+        <div className="mt-8 space-y-4">
+          <p className="text-center text-gray-600 font-semibold">
+            Already member?{" "}
+            <Link to="/login" className="text-pink-900 font-bold hover:underline">
+              Login
+            </Link>
+          </p>
+
+          <div className="flex justify-center items-center text-sm pt-4 border-t border-gray-100">
+            <Link to="/" className="text-gray-400 hover:text-gray-900 flex items-center gap-1">
+              Back to home
+            </Link>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+export default Register;
